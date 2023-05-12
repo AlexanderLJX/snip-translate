@@ -155,10 +155,10 @@ def main():
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Snipping Tool with TTS and translation options")
-    parser.add_argument("--untranslated_tts_speed", type=float, default=0.9, help="Speed factor for untranslated TTS playback")
-    parser.add_argument("--translate", action="store_true", default=True, help="Enable translation")
-    parser.add_argument("--tts_translated", action="store_true", default=True, help="Enable text to speech for translated text")
-    parser.add_argument("--tts_untranslated", action="store_true", default=True, help="Enable text to speech for untranslated text")
+    parser.add_argument("--untranslated_tts_speed", type=float, default=1.0, help="Speed factor for untranslated TTS playback")
+    parser.add_argument("--translate", action="store_true", default=False, help="Enable translation")
+    parser.add_argument("--tts_translated", action="store_true", default=False, help="Enable text to speech for translated text")
+    parser.add_argument("--tts_untranslated", action="store_true", default=False, help="Enable text to speech for untranslated text")
     return parser.parse_args()
 
 

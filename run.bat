@@ -1,7 +1,8 @@
 @echo off
 
-rem Set the environment name and file paths
-set env_name=tts
+REM Set the environment name and arguments
+set env_name=sniptranslate
+set arguments=--untranslated_tts_speed 0.9 --translate --tts_translated --tts_untranslated
 
 REM Check if the Conda environment is already installed
 call conda activate %env_name% 2>NUL
