@@ -40,4 +40,6 @@ rubberband allows you to use the `--untranslated_tts_speed` to change the speed 
 
 ### Run the application
 
-1. Double-click `run.bat` to start the program.
+1. Double-click `run.bat` to start the program. 
+2. Wait a few minutes to download
+3. Use `ctrl+shift+s` to snip. Scanned text will be copied to clipboard.
