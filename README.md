@@ -9,7 +9,7 @@ https://user-images.githubusercontent.com/83382087/237959812-dc56a76a-1155-4413-
 
 ## Features
 
-- Advanced snipping tool
+- Snipping tool
 - Tesseract OCR for accurate text scanning ([tesseract-ocr/tesseract](https://github.com/tesseract-ocr/tesseract))
 - Unlimited Google Translate with support for multiple proxies ([vitalets/google-translate-api](https://github.com/vitalets/google-translate-api))
 - Text to speech powered by Coqui TTS ([coqui-ai/TTS](https://github.com/coqui-ai/TTS))
