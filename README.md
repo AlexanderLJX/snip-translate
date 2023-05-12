@@ -20,7 +20,7 @@ https://user-images.githubusercontent.com/83382087/237959812-dc56a76a-1155-4413-
 ### Install Tesseract OCR
 
 1. Download and install Tesseract OCR from [UB-Mannheim/tesseract](https://github.com/UB-Mannheim/tesseract/wiki).
-2. Download the vertical Japanese traineddata file [jpn_vert.traineddata](https://github.com/tesseract-ocr/tessdata/raw/main/jpn_vert.traineddata) and place it in `C:\Program Files\Tesseract-OCR\tessdata`.
+2. Download the vertical Japanese traineddata file [jpn_vert.traineddata](https://github.com/tesseract-ocr/tessdata/raw/main/jpn_vert.traineddata) and place it in `C:\Program Files\Tesseract-OCR\tessdata`. (If you have installed Tesseract OCR in another directory, you would need to edit the python file to change directory as well)
 3. For other languages, visit [tesseract-ocr/tessdata](https://github.com/tesseract-ocr/tessdata).
 
 ### Install espeak
