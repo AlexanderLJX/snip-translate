@@ -31,7 +31,7 @@ https://user-images.githubusercontent.com/83382087/237959812-dc56a76a-1155-4413-
 
 ### Install rubberband (Optional)
 
-rubberband allows you to use the `--untranslated_tts_speed` to change the speed of the audio playback.
+rubberband allows you to use the `--untranslated_tts_speed` arugment to change the speed of the audio playback.
 
 1. Download the rubberband cli from [rubberband downloads](https://breakfastquay.com/rubberband/index.html) and add the files to your environment path or just copy them into the root directory of this project.
 
