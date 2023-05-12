@@ -16,14 +16,22 @@ if %ERRORLEVEL% neq 0 (
     call pip install -r requirements.txt
 )
 
-REM Install the @vitalets/google-translate-api package
-call npm install @vitalets/google-translate-api
+REM Check if @vitalets/google-translate-api package is already installed
+call npm list --depth=0 @vitalets/google-translate-api >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+    REM Install the @vitalets/google-translate-api package
+    call npm install @vitalets/google-translate-api
+)
 
 REM Update the package.json file to include "type": "module"
 call python update_package_json.py
 
-REM Install the http-proxy-agent package
-call npm install http-proxy-agent
+REM Check if http-proxy-agent package is already installed
+call npm list --depth=0 http-proxy-agent >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+    REM Install the http-proxy-agent package
+    call npm install http-proxy-agent
+)
 
 REM Set the title back to snip-translate
 title snip-translate
