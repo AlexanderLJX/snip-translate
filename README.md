@@ -5,7 +5,7 @@ Initially designed for Japanese to English translation, but easily adaptable for
 
 ## Demo
 
-https://user-images.githubusercontent.com/83382087/237932300-5d0863d5-d897-4e91-a2a2-7a474a1fd0c0.mp4
+https://user-images.githubusercontent.com/83382087/237959812-dc56a76a-1155-4413-85b7-1564791f07be.mp4
 
 ## Features
 
