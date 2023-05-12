@@ -34,6 +34,10 @@ rubberband allows you to use the `--untranslated_tts_speed` to change the speed 
 
 1. Download the rubberband cli from [rubberband downloads](https://breakfastquay.com/rubberband/index.html) and add the files to your environment path or just copy them into the root directory of this project.
 
+### Install Node.js
+
+Install [Node.js](https://nodejs.org/en)
+
 ### Install Anaconda
 
 1. Download and install Anaconda from [anaconda.com/download](https://www.anaconda.com/download/) and add it to your environment path.
