@@ -14,6 +14,7 @@ https://user-images.githubusercontent.com/83382087/237959812-dc56a76a-1155-4413-
 - Unlimited Google Translate using multiple proxies ([vitalets/google-translate-api](https://github.com/vitalets/google-translate-api))
 - Text to speech powered by Coqui TTS ([coqui-ai/TTS](https://github.com/coqui-ai/TTS))
 - Automatically copies scanned text to clipboard
+- Editable arguments in the bat file to turn on/off features
 
 ## Installation
 
