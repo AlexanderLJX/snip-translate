@@ -14,6 +14,8 @@ if %ERRORLEVEL% neq 0 (
     call conda activate %env_name%
     REM Install the packages from requirements.txt
     call pip install -r requirements.txt
+) else (
+    echo conda env %env_name% already created.
 )
 
 REM Check if @vitalets/google-translate-api package is already installed
