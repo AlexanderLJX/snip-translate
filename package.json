@@ -1,8 +1,0 @@
-{
-  "type": "module",
-  "dependencies": {
-    "@vitalets/google-translate-api": "^9.1.0",
-    "abort-controller": "^3.0.0",
-    "http-proxy-agent": "^6.0.1"
-  }
-}

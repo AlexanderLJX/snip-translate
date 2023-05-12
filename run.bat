@@ -1,4 +1,5 @@
 @echo off
+title snip-translate
 
 REM Set the environment name and arguments
 set env_name=sniptranslate
@@ -15,11 +16,23 @@ if %ERRORLEVEL% neq 0 (
     call pip install -r requirements.txt
 )
 
+REM Install the @vitalets/google-translate-api package
+call npm install @vitalets/google-translate-api
+
+REM Update the package.json file to include "type": "module"
+call python update_package_json.py
+
+REM Install the http-proxy-agent package
+call npm install http-proxy-agent
+
+REM Set the title back to snip-translate
+title snip-translate
+
 REM Start the eSpeak NG application
 start "" /B "C:\Program Files\eSpeak NG\espeak-ng.exe"
 
 REM Run the Python script
-start "" /B python test.py
+start "" /B python test.py %arguments%
 
 REM Wait for both processes to finish
 :wait_loop

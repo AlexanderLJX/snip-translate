@@ -166,5 +166,7 @@ input.txt
 output.txt
 output.wav
 output_stretched.wav
+package.json
 package-lock.json
 proxies.txt
+workingProxy.txt
