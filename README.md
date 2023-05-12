@@ -1,5 +1,5 @@
 # Snip-Translate
-A handy snipping tool with TTS and translation options
+A handy snipping tool with TTS and translation options designed for Windows
 
 Initially designed for Japanese to English translation, but easily adaptable for other languages
 
