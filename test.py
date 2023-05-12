@@ -117,14 +117,15 @@ class SnippingTool(QMainWindow):
         # Load the audio file using librosa
         y, sr = librosa.load("output.wav", sr=None)
 
-        # Time-stretch the audio without changing the pitch using Rubber Band Library
-        y_stretched = pyrb.time_stretch(y, sr, speed)  # Slow down by the reciprocal of the speed
+        if speed != 1.0:
+            # Time-stretch the audio without changing the pitch using Rubber Band Library
+            y_stretched = pyrb.time_stretch(y, sr, speed)  # Slow down by the reciprocal of the speed
 
-        # Save the stretched audio
-        sf.write("output_stretched.wav", y_stretched, sr)
+            # Save the stretched audio
+            sf.write("output.wav", y_stretched, sr)
 
         chunk = 1024
-        f = wave.open(r"output_stretched.wav", "rb")
+        f = wave.open(r"output.wav", "rb")
         p = pyaudio.PyAudio()
         stream = p.open(format=p.get_format_from_width(f.getsampwidth()),
                         channels=f.getnchannels(),

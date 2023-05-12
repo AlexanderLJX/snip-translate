@@ -28,6 +28,12 @@ https://user-images.githubusercontent.com/83382087/237959812-dc56a76a-1155-4413-
 1. Download and install espeak from [espeak-ng/espeak-ng/releases](https://github.com/espeak-ng/espeak-ng/releases/).
 2. Note that espeak is used in the VITS English TTS.
 
+### Install rubberband (Optional)
+
+rubberband allows you to use the `--untranslated_tts_speed` to change the speed of the audio playback.
+
+1. Download the rubberband cli from [rubberband downloads](https://breakfastquay.com/rubberband/index.html).
+
 ### Install Anaconda
 
 1. Download and install Anaconda from [anaconda.com/download](https://www.anaconda.com/download/) and add it to your environment path.
