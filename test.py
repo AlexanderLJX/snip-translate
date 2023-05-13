@@ -123,7 +123,7 @@ class SnippingTool(QMainWindow):
         with open('input.txt', 'w', encoding='utf-8') as f:
             f.write(text)
         print('Translating...'+text)
-        subprocess.run(['node', 'translate.js', 'input.txt', 'output.txt', self.args.proxy_timeout])
+        subprocess.run(['node', 'translate.js', 'input.txt', 'output.txt', str(self.args.proxy_timeout)])
         print('Translated')
         with open('output.txt', 'r', encoding='utf-8') as f:
             translated_text = f.read()
