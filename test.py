@@ -98,7 +98,15 @@ class SnippingTool(QMainWindow):
             text = 'No text detected'
             self.text_to_speech(text, ttsen)
             return
+        # Remove newlines and brackets
         text = text.replace("\n", " ")
+        text = text.replace("]", "")
+        text = text.replace("[", "")
+        text = text.replace("」", "")
+        text = text.replace("「", "")
+        text = text.replace("』", "")
+        text = text.replace("『", "")
+
         if self.args.tts_untranslated:
             self.text_to_speech(text, ttsjp, speed=self.args.untranslated_tts_speed)
         pyperclip.copy(text)
@@ -115,7 +123,7 @@ class SnippingTool(QMainWindow):
         with open('input.txt', 'w', encoding='utf-8') as f:
             f.write(text)
         print('Translating...'+text)
-        subprocess.run(['node', 'translate.js', 'input.txt', 'output.txt'])
+        subprocess.run(['node', 'translate.js', 'input.txt', 'output.txt', self.args.proxy_timeout])
         print('Translated')
         with open('output.txt', 'r', encoding='utf-8') as f:
             translated_text = f.read()
@@ -165,6 +173,7 @@ def parse_arguments():
     parser.add_argument("--tts_translated", action="store_true", default=False, help="Enable text to speech for translated text")
     parser.add_argument("--tts_untranslated", action="store_true", default=False, help="Enable text to speech for untranslated text")
     parser.add_argument("--use_manga_ocr", action="store_true", default=False, help="Use manga-ocr instead of tesserocr")
+    parser.add_argument("--proxy_timeout", type=int, default=7, help="Timeout for proxy requests")
     return parser.parse_args()
 
 def main():
