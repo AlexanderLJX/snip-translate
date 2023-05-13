@@ -1,6 +1,7 @@
 beautifulsoup4==4.12.2
 keyboard==0.13.5
 librosa==0.10.0.post2
+manga_ocr==0.1.10
 PyAudio==0.2.13
 pyperclip==1.8.2
 PyQt5==5.15.9
@@ -8,7 +9,6 @@ PyQt5_sip==12.12.1
 pyrubberband==0.3.0
 pyscreenshot==3.1
 PySoundFile==0.9.0.post1
-pytesseract==0.3.10
 Requests==2.30.0
 soundfile==0.12.1
 TTS==0.13.3

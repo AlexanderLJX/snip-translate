@@ -1,5 +1,6 @@
 import sys
-import pytesseract
+import tesserocr
+from manga_ocr import MangaOcr
 from PyQt5.QtWidgets import QApplication, QMainWindow, QRubberBand
 from PyQt5.QtCore import Qt, QRect, QPoint, QSize, QThread, pyqtSignal
 import pyscreenshot as ImageGrab
@@ -16,13 +17,8 @@ import argparse
 import getproxies
 import time
 
-# model_name = TTS.list_models()[0]
-# tts = TTS(model_name)
 ttsjp = TTS(model_name="tts_models/ja/kokoro/tacotron2-DDC", progress_bar=False, gpu=False)
-# ttsen = TTS(model_name="tts_models/en/ljspeech/glow-tts", progress_bar=False, gpu=False)
-# ttsen = TTS(model_name="tts_models/en/ljspeech/fast_pitch", progress_bar=False, gpu=False)
 ttsen = TTS(model_name="tts_models/en/ljspeech/vits", progress_bar=False, gpu=False)
-# tts.tts_to_file(text="Hello world!", speaker=tts.speakers[0], language=tts.languages[0], file_path="output.wav")
 
 class HotkeyThread(QThread):
     hotkey_pressed = pyqtSignal()
@@ -68,16 +64,36 @@ class SnippingTool(QMainWindow):
     def capture(self):
         rect = self.rubber_band.geometry()
         self.close()
-        time.sleep(0.5)
+        time.sleep(0.1)
         x, y, w, h = rect.x(), rect.y(), rect.width(), rect.height()
 
         left, top, right, bottom = min(x, x+w), min(y, y+h), max(x, x+w), max(y, y+h)
 
         img = ImageGrab.grab(bbox=(left, top, right, bottom))
+        # Get the width and height of the image
+        width, height = img.size
+        # Calculate the area of the image
+        area = width * height
+        if area < 10:
+            print("Operation cancelled due to small area")
+            return
         img.save('capture.png', 'png')
 
-        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
-        text = pytesseract.image_to_string(img, lang='jpn_vert')
+        text = ''
+        if self.args.use_manga_ocr:
+            mocr = MangaOcr()
+            text = mocr(img)
+        else:
+            # Initialize the tesserocr API with the Japanese language and vertical text mode
+            with tesserocr.PyTessBaseAPI(lang='jpn_vert') as api:
+                # Set the image for OCR
+                print("OCR-ing...")
+                api.SetImage(img)
+                print("OCR-ed")
+                # Get the OCR text
+                text = api.GetUTF8Text()
+                print("OCR text: "+text)
+
         if text == '':
             text = 'No text detected'
             self.text_to_speech(text, ttsen)
@@ -148,6 +164,7 @@ def parse_arguments():
     parser.add_argument("--translate", action="store_true", default=False, help="Enable translation")
     parser.add_argument("--tts_translated", action="store_true", default=False, help="Enable text to speech for translated text")
     parser.add_argument("--tts_untranslated", action="store_true", default=False, help="Enable text to speech for untranslated text")
+    parser.add_argument("--use_manga_ocr", action="store_true", default=False, help="Use manga-ocr instead of tesserocr")
     return parser.parse_args()
 
 def main():

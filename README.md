@@ -43,8 +43,11 @@ Install [Node.js](https://nodejs.org/en)
 
 1. Download and install Anaconda from [anaconda.com/download](https://www.anaconda.com/download/) and add it to your environment path.
 
+### Install packages
+
+1. Double-click `install.bat` to install additional packages.
+
 ### Run the application
 
-1. Double-click `run.bat` to start the program. 
-2. Wait a few minutes to download
-3. Use `ctrl+shift+s` to snip. Scanned text will be copied to clipboard.
+1. Double-click `run.bat` to start the program.
+2. Use `ctrl+shift+s` to snip. Scanned text will be copied to clipboard.
