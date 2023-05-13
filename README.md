@@ -10,7 +10,8 @@ https://user-images.githubusercontent.com/83382087/237959812-dc56a76a-1155-4413-
 ## Features
 
 - Snipping tool
-- Tesseract OCR for accurate text scanning ([tesseract-ocr/tesseract](https://github.com/tesseract-ocr/tesseract))
+- Manga OCR (default OCR) ([kha-white/manga-ocr](https://github.com/kha-white/manga-ocr))
+- Tesserocr ([sirfz/tesserocr](https://github.com/sirfz/tesserocr))
 - Unlimited Google Translate using multiple proxies ([vitalets/google-translate-api](https://github.com/vitalets/google-translate-api))
 - Text to speech powered by Coqui TTS ([coqui-ai/TTS](https://github.com/coqui-ai/TTS))
 - Automatically copies scanned text to clipboard
@@ -18,16 +19,11 @@ https://user-images.githubusercontent.com/83382087/237959812-dc56a76a-1155-4413-
 
 ## Installation
 
-### Install Tesseract OCR
-
-1. Download and install Tesseract OCR from [UB-Mannheim/tesseract](https://github.com/UB-Mannheim/tesseract/wiki).
-2. Download the vertical Japanese traineddata file [jpn_vert.traineddata](https://github.com/tesseract-ocr/tessdata/raw/main/jpn_vert.traineddata) and place it in `C:\Program Files\Tesseract-OCR\tessdata`. (If you have installed Tesseract OCR in another directory, you would need to edit the python file to change directory as well)
-3. For other languages, visit [tesseract-ocr/tessdata](https://github.com/tesseract-ocr/tessdata).
-
 ### Install espeak
 
 1. Download and install espeak from [espeak-ng/espeak-ng/releases](https://github.com/espeak-ng/espeak-ng/releases/).
-2. Note that espeak is used in the VITS English TTS.
+2. The installation directory should be `C:\Program Files\eSpeak NG\espeak-ng.exe` else you should modify the `run.bat` file accordingly.
+Note that espeak is used in the VITS English TTS.
 
 ### Install rubberband (Optional)
 
