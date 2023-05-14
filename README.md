@@ -12,6 +12,7 @@ https://user-images.githubusercontent.com/83382087/237959812-dc56a76a-1155-4413-
 - Snipping tool
 - Manga OCR (default OCR) ([kha-white/manga-ocr](https://github.com/kha-white/manga-ocr))
 - Tesserocr ([sirfz/tesserocr](https://github.com/sirfz/tesserocr))
+- Free chatGPT translation using free api (better than DeepL and Google Translate imo) (default translation tts)
 - Unlimited Google Translate using multiple proxies ([vitalets/google-translate-api](https://github.com/vitalets/google-translate-api))
 - Text to speech powered by Coqui TTS ([coqui-ai/TTS](https://github.com/coqui-ai/TTS))
 - Automatically copies scanned text to clipboard
