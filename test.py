@@ -15,7 +15,7 @@ import soundfile as sf
 import pyrubberband as pyrb
 import argparse
 import getproxies
-import time
+from requestgpt import get_translation
 
 ttsjp = TTS(model_name="tts_models/ja/kokoro/tacotron2-DDC", progress_bar=False, gpu=False)
 ttsen = TTS(model_name="tts_models/en/ljspeech/vits", progress_bar=False, gpu=False)
@@ -64,7 +64,6 @@ class SnippingTool(QMainWindow):
     def capture(self):
         rect = self.rubber_band.geometry()
         self.close()
-        time.sleep(0.1)
         x, y, w, h = rect.x(), rect.y(), rect.width(), rect.height()
 
         left, top, right, bottom = min(x, x+w), min(y, y+h), max(x, x+w), max(y, y+h)
@@ -98,6 +97,7 @@ class SnippingTool(QMainWindow):
             text = 'No text detected'
             self.text_to_speech(text, ttsen)
             return
+        
         # Remove newlines and brackets
         text = text.replace("\n", " ")
         text = text.replace("]", "")
@@ -122,18 +122,27 @@ class SnippingTool(QMainWindow):
     def translate_and_copy_to_clipboard(self, text):
         with open('input.txt', 'w', encoding='utf-8') as f:
             f.write(text)
-        print('Translating...'+text)
+
+        # Translate via Google Translate
         subprocess.run(['node', 'translate.js', 'input.txt', 'output.txt', str(self.args.proxy_timeout)])
-        print('Translated')
         with open('output.txt', 'r', encoding='utf-8') as f:
             translated_text = f.read()
-
-        print("post-translated text: "+translated_text)
-        # pyperclip.copy(translated_text)
+        print("Google Translate: "+translated_text)
         if translated_text == '':
             translated_text = 'No text detected'
         if self.args.tts_translated:
             self.text_to_speech(translated_text, ttsen)
+
+        # # Translate via ChatGPT
+        # result = get_translation(text)
+        # # Handle the result of get_translation here
+        # print("ChatGPT: "+result)
+        # if result == '':
+        #     result = 'No text detected'
+        # if self.args.tts_chatgpt:
+        #     self.text_to_speech(result, ttsen)
+        # print("finished chatgpt")
+        
 
     def text_to_speech(self, text, tts, speed=1.0):
         tts.tts_to_file(text=text, file_path="output.wav")
@@ -171,9 +180,10 @@ def parse_arguments():
     parser.add_argument("--untranslated_tts_speed", type=float, default=1.0, help="Speed factor for untranslated TTS playback")
     parser.add_argument("--translate", action="store_true", default=False, help="Enable translation")
     parser.add_argument("--tts_translated", action="store_true", default=False, help="Enable text to speech for translated text")
+    parser.add_argument("--tts_chatgpt", action="store_true", default=False, help="Enable text to speech for chatgpt output")
     parser.add_argument("--tts_untranslated", action="store_true", default=False, help="Enable text to speech for untranslated text")
     parser.add_argument("--use_manga_ocr", action="store_true", default=False, help="Use manga-ocr instead of tesserocr")
-    parser.add_argument("--proxy_timeout", type=int, default=7, help="Timeout for proxy requests")
+    parser.add_argument("--proxy_timeout", type=int, default=7000, help="Timeout for proxy requests (milliseconds))")
     return parser.parse_args()
 
 def main():
