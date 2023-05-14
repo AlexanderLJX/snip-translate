@@ -16,6 +16,7 @@ import pyrubberband as pyrb
 import argparse
 import getproxies
 from requestgpt import get_translation
+import threading
 
 ttsjp = TTS(model_name="tts_models/ja/kokoro/tacotron2-DDC", progress_bar=False, gpu=False)
 ttsen = TTS(model_name="tts_models/en/ljspeech/vits", progress_bar=False, gpu=False)
@@ -33,6 +34,7 @@ class SnippingTool(QMainWindow):
         super().__init__()
         self.args = args
         self.initUI()
+        self.tts_lock = threading.Lock()
 
     def initUI(self):
         self.setWindowTitle('Snipping Tool')
@@ -108,7 +110,8 @@ class SnippingTool(QMainWindow):
         text = text.replace("『", "")
 
         if self.args.tts_untranslated:
-            self.text_to_speech(text, ttsjp, speed=self.args.untranslated_tts_speed)
+            untranslated_tts_thread = threading.Thread(target=self.text_to_speech, args=(text,ttsjp, "untranslated.wav", self.args.untranslated_tts_speed))
+            untranslated_tts_thread.start()
         pyperclip.copy(text)
         if self.args.translate:
             print("Text copied to clipboard")
@@ -124,6 +127,14 @@ class SnippingTool(QMainWindow):
             f.write(text)
 
         # Translate via Google Translate
+        google_translate_thread = threading.Thread(target=self.google_translate, args=(text,))
+        google_translate_thread.start()
+
+        # Translate via ChatGPT
+        chatgpt_thread = threading.Thread(target=self.chatgpt_translate, args=(text,))
+        chatgpt_thread.start()
+
+    def google_translate(self, text):
         subprocess.run(['node', 'translate.js', 'input.txt', 'output.txt', str(self.args.proxy_timeout)])
         with open('output.txt', 'r', encoding='utf-8') as f:
             translated_text = f.read()
@@ -131,35 +142,36 @@ class SnippingTool(QMainWindow):
         if translated_text == '':
             translated_text = 'No text detected'
         if self.args.tts_translated:
-            self.text_to_speech(translated_text, ttsen)
+            self.text_to_speech(translated_text, ttsen, "translated.wav")
 
-        # # Translate via ChatGPT
-        # result = get_translation(text)
-        # # Handle the result of get_translation here
-        # print("ChatGPT: "+result)
-        # if result == '':
-        #     result = 'No text detected'
-        # if self.args.tts_chatgpt:
-        #     self.text_to_speech(result, ttsen)
-        # print("finished chatgpt")
+    def chatgpt_translate(self, text):
+        result = get_translation(text)
+        # Handle the result of get_translation here
+        print("ChatGPT: "+result)
+        if result == '':
+            result = 'No text detected'
+        if self.args.tts_chatgpt:
+            self.text_to_speech(result, ttsen, "chatgpt.wav")
+        print("finished chatgpt")
         
 
-    def text_to_speech(self, text, tts, speed=1.0):
-        tts.tts_to_file(text=text, file_path="output.wav")
+    def text_to_speech(self, text, tts, filename, speed=1.0):
+        tts.tts_to_file(text=text, file_path=filename)
 
         # Load the audio file using librosa
-        y, sr = librosa.load("output.wav", sr=None)
+        y, sr = librosa.load(filename, sr=None)
 
         if speed != 1.0:
             # Time-stretch the audio without changing the pitch using Rubber Band Library
             y_stretched = pyrb.time_stretch(y, sr, speed)  # Slow down by the reciprocal of the speed
 
             # Save the stretched audio
-            sf.write("output.wav", y_stretched, sr)
+            sf.write(filename, y_stretched, sr)
 
         chunk = 1024
-        f = wave.open(r"output.wav", "rb")
+        f = wave.open(filename, "rb")
         p = pyaudio.PyAudio()
+        self.tts_lock.acquire()
         stream = p.open(format=p.get_format_from_width(f.getsampwidth()),
                         channels=f.getnchannels(),
                         rate=f.getframerate(),
@@ -174,6 +186,7 @@ class SnippingTool(QMainWindow):
         stream.stop_stream()
         stream.close()
         p.terminate()
+        self.tts_lock.release()
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Snipping Tool with TTS and translation options")

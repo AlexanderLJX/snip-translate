@@ -4,7 +4,7 @@ import { HttpProxyAgent } from 'http-proxy-agent';
 
 const inputFile = process.argv[2];
 const outputFile = process.argv[3];
-const proxyTimeout = process.argv[4];
+const proxyTimeout = parseInt(process.argv[4]);
 const proxyListFile = 'proxies.txt';
 const workingProxyFile = 'workingProxy.txt';
 
@@ -24,7 +24,7 @@ fs.readFile(proxyListFile, 'utf8', async (err, proxies) => {
       const { text: translatedText } = await Promise.race([
         translate(data, { to: 'en', fetchOptions: { agent } }),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Proxy request timeout')), int(proxyTimeout))
+          setTimeout(() => reject(new Error('Proxy request timeout')), proxyTimeout)
         ),
       ]);
   
