@@ -170,3 +170,4 @@ package.json
 package-lock.json
 proxies.txt
 workingProxy.txt
+*.wav
