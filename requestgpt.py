@@ -2,46 +2,119 @@
 import requests
 import json
 
-def get_translation(input):
+def get_gpt_translation(input, length="medium", timeout=7):
     url = "https://free.churchless.tech/v1/chat/completions"
     headers = {"Content-Type": "application/json"}
-    payload = {
+    payload_short = {
+        "messages": [
+            {
+                "role": "user",
+                "content": "translate the following to English:\"さっきからこいつの思考が全く読めない\" \n Reply with only the translation, do not add any additional words or explanations."
+            },
+            {
+                "role": "assistant",
+                "content": "I haven't been able to read this person's thoughts at all since a while ago."
+            },
+            {
+                "role": "user",
+                "content": "translate the following to English:\"球磨川が目の前にいるってのに！どうしてブルってんだよ俺の身体！！\" \n Reply with only the translation, do not add any additional words or explanations."
+            },
+            {
+                "role": "assistant",
+                "content": "Even though Kumagawa is right in front of me! Why is my body trembling?!"
+            },
+            {
+                "role": "user",
+                "content": "translate the following to English:\"これは僕が己の過ちに対して支払った代償であり\" \n Reply with only the translation, do not add any additional words or explanations."
+            },
+            {
+                "role": "assistant",
+                "content": "This is the price I paid for my own mistakes."
+            },
+            {
+                "role": "user",
+                "content": "translate the following to English:\"" + input + "\" \n Reply with only the translation, do not add any additional words or explanations."
+            }
+        ],
+        "model": "gpt-3.5-turbo",
+        "temperature": 1,
+        "presence_penalty": 0,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "stream": True
+    }
+    payload_medium = {
+        "messages": [
+            {
+                "role": "user",
+                "content": "translate the following to English:\"さっきからこいつの思考が全く読めない\" \n Reply with only the translation, followed by a full explanation starting with \"Full explanation:\"."
+            },
+            {
+                "role": "assistant",
+                "content": "I haven't been able to read this person's thoughts at all since a while ago. \nFull explanation: The speaker is expressing their inability to understand or predict what someone else is thinking."
+            },
+            {
+                "role": "user",
+                "content": "translate the following to English:\"球磨川が目の前にいるってのに！どうしてブルってんだよ俺の身体！！\" \n Reply with only the translation, followed by a full explanation starting with \"Full explanation:\"."
+            },
+            {
+                "role": "assistant",
+                "content": "Even though Kumagawa is right in front of me! Why is my body trembling?! \nFull explanation: The speaker is expressing their surprise and frustration about their body trembling despite being in the presence of Kumagawa."
+            },
+            {
+                "role": "user",
+                "content": "translate the following to English:\"これは僕が己の過ちに対して支払った代償であり\" \n Reply with only the translation, followed by a full explanation starting with \"Full explanation:\"."
+            },
+            {
+                "role": "assistant",
+                "content": "This is the price I paid for my own mistakes. \nFull explanation: The speaker is acknowledging that the situation they are facing is a consequence or payment they have to bear for their own errors or wrongdoings. It suggests a sense of personal accountability and responsibility for the negative outcome they are experiencing."
+            },
+            {
+                "role": "user",
+                "content": "translate the following to English:\"" + input + "\" \n Reply with only the translation, followed by a full explanation starting with \"Full explanation:\"."
+            }
+        ],
+        "model": "gpt-3.5-turbo",
+        "temperature": 1,
+        "presence_penalty": 0,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "stream": True
+    }
+
+    payload_long = {
         "messages": [
             # {
             #     "role": "user",
-            #     "content": "what is the meaning of \"すがりつきたくなるような嘘\" in english?"
+            #     "content": "translate the following to English:\"さっきからこいつの思考が全く読めない\" \n Reply with only the translation, followed by a full in depth explanation starting with \"Full explanation:\"."
             # },
             # {
             #     "role": "assistant",
-            #     "content": "The phrase can be roughly translated to \"a lie that makes you want to cling onto it\". It refers to a deceitful statement or story that is so emotionally compelling that the listener feels a strong desire to believe it, despite knowing that it's untrue. \n\nThis expression is often used to describe a lie that is told in a relationship or in a personal context, where the speaker may use it to maintain a sense of closeness or intimacy with the listener. It can also be used to describe a lie that is used to comfort or reassure someone, even if it's not entirely true.\n\nOverall, this phrase expresses the emotional power of a lie to elicit a strong emotional response in the listener, even if they know it's not true."
+            #     "content": "I haven't been able to read this person's thoughts at all since a while ago. \nFull explanation: The speaker is expressing their inability to understand or predict what someone else is thinking."
             # },
-            {
-                "role": "user",
-                "content": "translate the following to English:\"さっきからこいつの思考が全く読めない\" \n Reply with only the translation, do not add additional words."
-            },
-            {
-                "role": "assistant",
-                "content": "I can\'t read this person\'s thoughts at all since earlier."
-            },
-            {
-                "role": "user",
-                "content": "translate the following to English:\"球磨川が目の前にいるってのに！どうしてブルってんだよ俺の身体！！\" \n Reply with only the translation, do not add additional words."
-            },
-            {
-                "role": "assistant",
-                "content": "Even though Kumagawa is right in front of me! Why is my body trembling!!"
-            },
             # {
             #     "role": "user",
-            #     "content": "translate the following to English:\"この男は私達の中学時代の先輩ですよお姉さま\" \n Reply with only the translation, do not add additional words."
+            #     "content": "translate the following to English:\"球磨川が目の前にいるってのに！どうしてブルってんだよ俺の身体！！\" \n Reply with only the translation, followed by a full in depth explanation starting with \"Full explanation:\"."
             # },
             # {
             #     "role": "assistant",
-            #     "content": "This boy is our senior from junior high school, Onee-sama."
+            #     "content": "Even though Kumagawa is right in front of me! Why is my body trembling?! \nFull explanation: The speaker is expressing their surprise and frustration about their body trembling despite being in the presence of Kumagawa."
             # },
             {
                 "role": "user",
-                "content": "translate the following to English:\"" + input + "\" \n Reply with only the translation, do not add additional words."
+                "content": "translate the following to English:\"これは僕が己の過ちに対して支払った代償であり\" \n Reply with only the translation, followed by a full in depth explanation starting with \"Full explanation:\"."
+            },
+            {
+                "role": "assistant",
+                "content": """This is the price I paid for my own mistakes. \nFull explanation: 1. これは (Kore wa): This means "this is" and is used to refer to something that has been mentioned or is being discussed.
+2. 僕が (boku ga): "僕" (boku) is a first-person pronoun meaning "I" or "me," and "が" (ga) is a subject marker. Together, they mean "I" as the subject of the sentence.
+3. 己の過ちに対して (onore no ayamachi ni taishite): "己" (onore) is a pronoun meaning "oneself" or "myself." "過ち" (ayamachi) means "mistake" or "error." "に対して" (ni taishite) is a preposition meaning "toward" or "in relation to." So, this phrase means "toward my own mistakes."
+4. 支払った代償であり (shiharatta daishou de ari): "支払った" (shiharatta) is the past tense of the verb "支払う" (shiharau), which means "to pay" or "to compensate." "代償" (daishou) means "price" or "compensation." "であり" (de ari) is a formal way to say "is" or "to be." This phrase means "the price I paid."
+Putting it all together, the sentence これは僕が己の過ちに対して支払った代償であり (Kore wa boku ga onore no ayamachi ni taishite shiharatta daishou de ari) means "This is the price I paid for my own mistakes." It conveys a sense of responsibility and acknowledgment of one's own errors and the consequences that followed."""
+            },
+            {
+                "role": "user",
+                "content": "translate the following to English:\"" + input + "\" \n Reply with only the translation, followed by a full in depth explanation starting with \"Full explanation:\"."
             }
         ],
         "model": "gpt-3.5-turbo",
@@ -53,8 +126,17 @@ def get_translation(input):
     }
 
     try:
-        response = requests.post(url, data=json.dumps(payload), headers=headers, timeout=7)
-        response.raise_for_status()
+        if length == "short":
+            response = requests.post(url, data=json.dumps(payload_short), headers=headers, timeout=timeout)
+            response.raise_for_status()
+        elif length == "medium":
+            response = requests.post(url, data=json.dumps(payload_medium), headers=headers, timeout=timeout)
+            response.raise_for_status()
+        elif length == "long":
+            response = requests.post(url, data=json.dumps(payload_long), headers=headers, timeout=timeout)
+            response.raise_for_status()
+        else:
+            return "Invalid length. Please choose a valid length."
 
         # Initialize an empty string to store the combined content
         combined_content = ""
