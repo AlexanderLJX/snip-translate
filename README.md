@@ -4,8 +4,8 @@ A handy snipping tool with TTS and translation options designed for Windows
 Initially designed for Japanese to English translation, but easily adaptable for other languages
 
 ## Demo
-
-https://user-images.githubusercontent.com/83382087/237959812-dc56a76a-1155-4413-85b7-1564791f07be.mp4
+No gpu demo
+https://github-production-user-asset-6210df.s3.amazonaws.com/83382087/238321576-61be4b33-d40a-4570-b2e8-1900047a663c.mp4
 
 ## Features
 

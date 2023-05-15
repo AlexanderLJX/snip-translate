@@ -1,8 +1,7 @@
 @echo off
-title snip-translate
 
 set env_name=sniptranslate
-set arguments=--untranslated_tts_speed 1.0 --translate --tts_chatgpt --tts_untranslated --use_manga_ocr --proxy_timeout 4000
+set arguments=--untranslated_tts_speed 1.0 --translate --tts_chatgpt --tts_untranslated --proxy_timeout 4000
 
 REM Set the title back to snip-translate
 title snip-translate

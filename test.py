@@ -18,8 +18,6 @@ import getproxies
 from requestgpt import get_translation
 import threading
 
-ttsjp = TTS(model_name="tts_models/ja/kokoro/tacotron2-DDC", progress_bar=False, gpu=False)
-ttsen = TTS(model_name="tts_models/en/ljspeech/vits", progress_bar=False, gpu=False)
 
 class HotkeyThread(QThread):
     hotkey_pressed = pyqtSignal()
@@ -35,6 +33,9 @@ class SnippingTool(QMainWindow):
         self.args = args
         self.initUI()
         self.tts_lock = threading.Lock()
+        self.ttsjp = TTS(model_name="tts_models/ja/kokoro/tacotron2-DDC", progress_bar=False, gpu=self.args.use_gpu)
+        self.ttsen = TTS(model_name="tts_models/en/ljspeech/vits", progress_bar=False, gpu=self.args.use_gpu)
+
 
     def initUI(self):
         self.setWindowTitle('Snipping Tool')
@@ -70,15 +71,12 @@ class SnippingTool(QMainWindow):
 
         left, top, right, bottom = min(x, x+w), min(y, y+h), max(x, x+w), max(y, y+h)
 
-        img = ImageGrab.grab(bbox=(left, top, right, bottom))
-        # Get the width and height of the image
-        width, height = img.size
-        # Calculate the area of the image
-        area = width * height
+        area = (right - left) * (bottom - top)
         if area < 10:
             print("Operation cancelled due to small area")
             return
-        img.save('capture.png', 'png')
+
+        img = ImageGrab.grab(bbox=(left, top, right, bottom))
 
         text = ''
         if self.args.use_manga_ocr:
@@ -97,7 +95,7 @@ class SnippingTool(QMainWindow):
 
         if text == '':
             text = 'No text detected'
-            self.text_to_speech(text, ttsen)
+            self.text_to_speech(text, self.ttsen)
             return
         
         # Remove newlines and brackets
@@ -110,7 +108,7 @@ class SnippingTool(QMainWindow):
         text = text.replace("『", "")
 
         if self.args.tts_untranslated:
-            untranslated_tts_thread = threading.Thread(target=self.text_to_speech, args=(text,ttsjp, "untranslated.wav", self.args.untranslated_tts_speed))
+            untranslated_tts_thread = threading.Thread(target=self.text_to_speech, args=(text,self.ttsjp, "untranslated.wav", self.args.untranslated_tts_speed))
             untranslated_tts_thread.start()
         pyperclip.copy(text)
         if self.args.translate:
@@ -142,7 +140,7 @@ class SnippingTool(QMainWindow):
         if translated_text == '':
             translated_text = 'No text detected'
         if self.args.tts_translated:
-            self.text_to_speech(translated_text, ttsen, "translated.wav")
+            self.text_to_speech(translated_text, self.ttsen, "translated.wav")
 
     def chatgpt_translate(self, text):
         result = get_translation(text)
@@ -151,7 +149,7 @@ class SnippingTool(QMainWindow):
         if result == '':
             result = 'No text detected'
         if self.args.tts_chatgpt:
-            self.text_to_speech(result, ttsen, "chatgpt.wav")
+            self.text_to_speech(result, self.ttsen, "chatgpt.wav")
         print("finished chatgpt")
         
 
@@ -197,6 +195,7 @@ def parse_arguments():
     parser.add_argument("--tts_untranslated", action="store_true", default=False, help="Enable text to speech for untranslated text")
     parser.add_argument("--use_manga_ocr", action="store_true", default=False, help="Use manga-ocr instead of tesserocr")
     parser.add_argument("--proxy_timeout", type=int, default=7000, help="Timeout for proxy requests (milliseconds))")
+    parser.add_argument("--use-gpu", action="store_true", default=False, help="Use GPU for TTS")
     return parser.parse_args()
 
 def main():
