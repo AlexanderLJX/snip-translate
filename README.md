@@ -5,7 +5,8 @@ Initially designed for Japanese to English translation, but easily adaptable for
 
 ## Demo
 No gpu demo
-https://github-production-user-asset-6210df.s3.amazonaws.com/83382087/238321576-61be4b33-d40a-4570-b2e8-1900047a663c.mp4
+
+https://user-images.githubusercontent.com/83382087/238321576-61be4b33-d40a-4570-b2e8-1900047a663c.mp4
 
 ## Features
 
