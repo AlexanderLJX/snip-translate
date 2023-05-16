@@ -10,7 +10,7 @@ https://user-images.githubusercontent.com/83382087/238321576-61be4b33-d40a-4570-
 
 GUI interface
 
-https://user-images.githubusercontent.com/83382087/238545251-48b1f7e2-dc34-4dc6-b4ff-e969bd3f9ba3.png
+![image](https://user-images.githubusercontent.com/83382087/238545251-48b1f7e2-dc34-4dc6-b4ff-e969bd3f9ba3.png)
 
 ## Features
 
