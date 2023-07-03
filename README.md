@@ -31,12 +31,6 @@ GUI interface
 2. The installation directory should be `C:\Program Files\eSpeak NG\espeak-ng.exe` else you should modify the `run.bat` file accordingly.
 Note that espeak is used in the VITS English TTS.
 
-### Install rubberband (Optional)
-
-rubberband allows you to use the `--untranslated_tts_speed` arugment to change the speed of the audio playback.
-
-1. Download the rubberband cli from [rubberband downloads](https://breakfastquay.com/rubberband/index.html) and add the files to your environment path or just copy them into the root directory of this project.
-
 ### Install Node.js
 
 Install [Node.js](https://nodejs.org/en)

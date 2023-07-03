@@ -85,9 +85,22 @@ class MainWindow(QWidget):
         self.proxy_timeout.setSingleStep(1000)
         self.proxy_timeout.setValue(self.args.proxy_timeout)
         translation_options_row2.addWidget(self.proxy_timeout)
-        self.manga_ocr_checkbox = QCheckBox("Use Manga OCR")
-        self.manga_ocr_checkbox.setChecked(self.args.use_manga_ocr)
-        translation_options_row2.addWidget(self.manga_ocr_checkbox)
+        
+        # Add combobox for OCR options
+        self.ocr_options_label = QLabel("OCR Options")
+        translation_options_row2.addWidget(self.ocr_options_label)
+
+        self.ocr_options_combobox = QComboBox()
+        self.ocr_options_combobox.addItem("Manga OCR")
+        self.ocr_options_combobox.addItem("TesserOCR jpn")
+        self.ocr_options_combobox.addItem("TesserOCR jpn_vert")
+        if self.args.use_manga_ocr:
+            self.ocr_options_combobox.setCurrentIndex(0)
+        else:
+            self.ocr_options_combobox.setCurrentIndex(2)
+        translation_options_row2.addWidget(self.ocr_options_combobox)
+
+        
         self.translation_options_layout.addLayout(translation_options_row2)
         # Align to left
         translation_options_row2.addStretch(1)
@@ -233,12 +246,22 @@ class SnippingTool(QMainWindow):
         img = ImageGrab.grab(bbox=(left, top, right, bottom))
 
         text = ''
-        if self.main_window.manga_ocr_checkbox.isChecked():
+        if self.main_window.ocr_options_combobox.currentText() == "Manga OCR":
             mocr = MangaOcr()
             text = mocr(img)
-        else:
+        elif self.main_window.ocr_options_combobox.currentText() == "TesserOCR jpn_vert":
             # Initialize the tesserocr API with the Japanese language and vertical text mode
             with tesserocr.PyTessBaseAPI(lang='jpn_vert') as api:
+                # Set the image for OCR
+                print("OCR-ing...")
+                api.SetImage(img)
+                print("OCR-ed")
+                # Get the OCR text
+                text = api.GetUTF8Text()
+                print("OCR text: "+text)
+        elif self.main_window.ocr_options_combobox.currentText() == "TesserOCR jpn":
+            # Initialize the tesserocr API with the Japanese language
+            with tesserocr.PyTessBaseAPI(lang='jpn') as api:
                 # Set the image for OCR
                 print("OCR-ing...")
                 api.SetImage(img)

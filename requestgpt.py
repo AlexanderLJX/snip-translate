@@ -5,7 +5,7 @@ import json
 def get_gpt_translation(input, length="medium", timeout=7):
     url = "https://free.churchless.tech/v1/chat/completions"
     headers = {"Content-Type": "application/json"}
-    payload_short = {
+    payload_short = {   
         "messages": [
             {
                 "role": "user",
@@ -160,11 +160,13 @@ The speaker is acknowledging that the situation they are facing is a consequence
                 try:
                     chunk_json = json.loads(json_content.decode("utf-8"))
 
-                    # Extract the content from the 'choices' list
-                    content = chunk_json["choices"][0]["delta"]["content"]
+                    # if chunk_json["choices"][0]["delta"]["content"] exists, then extract the content
+                    if "content" in chunk_json["choices"][0]["delta"]:
+                        # Extract the content from the 'choices' list
+                        content = chunk_json["choices"][0]["delta"]["content"]
 
-                    # Append the content to the combined_content string
-                    combined_content += content
+                        # Append the content to the combined_content string
+                        combined_content += content
 
                     # Break the loop when the finish_reason is 'stop'
                     finish_reason = chunk_json["choices"][0]["finish_reason"]
