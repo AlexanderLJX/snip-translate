@@ -4,7 +4,7 @@ from manga_ocr import MangaOcr
 from PyQt5.QtWidgets import QApplication, QMainWindow, QRubberBand
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QCheckBox, QGroupBox, QHBoxLayout, QSpinBox, QTextEdit, QComboBox, QRadioButton
 from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt, QRect, QPoint, QSize, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QRect, QPoint, QSize, QThread, pyqtSignal, QEvent
 import pyscreenshot as ImageGrab
 import keyboard
 import pyperclip
@@ -167,6 +167,13 @@ class MainWindow(QWidget):
         layout.addWidget(self.chatgpt_translation_length_group)
 
         self.setLayout(layout)
+
+    def changeEvent(self, event):
+        if event.type() == QEvent.ActivationChange:
+            if self.isActiveWindow():
+                self.raise_()
+                self.activateWindow()
+        super().changeEvent(event)
 
     def append_console_text(self, text):
         self.console.append(text)
