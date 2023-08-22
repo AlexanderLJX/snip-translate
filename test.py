@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QRubberBand
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QCheckBox, QGroupBox, QHBoxLayout, QSpinBox, QTextEdit, QComboBox, QRadioButton
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt, QRect, QPoint, QSize, QThread, pyqtSignal, QEvent
+from PyQt5.QtCore import QMetaObject, Qt 
+from PyQt5 import QtCore
 import pyscreenshot as ImageGrab
 import keyboard
 import pyperclip
@@ -119,8 +121,11 @@ class MainWindow(QWidget):
         self.font_size_spinbox = QSpinBox()
         self.font_size_spinbox.setMinimum(1)
         self.font_size_spinbox.setMaximum(100)
-        # check current font size of window
-        self.font_size_spinbox.setValue(self.font().pointSize())
+        # set size
+        self.font_size_spinbox.setValue(self.args.font_size)
+        
+        # # check current font size of window
+        # self.font_size_spinbox.setValue(self.font().pointSize())
         self.font_layout.addWidget(self.font_size_spinbox)
         # QHBox for font size of textedit
         self.font_size_textedit_layout = QHBoxLayout()
@@ -129,8 +134,11 @@ class MainWindow(QWidget):
         self.font_size_textedit_spinbox = QSpinBox()
         self.font_size_textedit_spinbox.setMinimum(1)
         self.font_size_textedit_spinbox.setMaximum(100)
-        # check current font size of textedit
-        self.font_size_textedit_spinbox.setValue(self.font().pointSize())
+        # set size
+        self.font_size_textedit_spinbox.setValue(self.args.console_font_size)
+        
+        # # check current font size of textedit
+        # self.font_size_textedit_spinbox.setValue(self.font().pointSize())
         self.font_layout.addWidget(self.font_size_textedit_spinbox)
         # align to left
         self.font_layout.addStretch(1)
@@ -146,6 +154,10 @@ class MainWindow(QWidget):
         self.console.setPlaceholderText("Press Ctrl+Shift+S to start snipping")
         layout.addWidget(self.console)
 
+        # update font size
+        self.update_font_size(self.args.font_size)
+        self.update_console_font_size(self.args.console_font_size)
+
         # Connect font size adjustment
         self.font_size_spinbox.valueChanged.connect(self.update_font_size)
         
@@ -156,11 +168,19 @@ class MainWindow(QWidget):
         chatgpt_translation_length_layout = QHBoxLayout()
         self.chatgpt_translation_length_short = QRadioButton("Short")
         self.chatgpt_translation_length_medium = QRadioButton("Medium")
-        self.chatgpt_translation_length_medium.setChecked(True) # Default to medium
         self.chatgpt_translation_length_long = QRadioButton("Long")
         chatgpt_translation_length_layout.addWidget(self.chatgpt_translation_length_short)
         chatgpt_translation_length_layout.addWidget(self.chatgpt_translation_length_medium)
         chatgpt_translation_length_layout.addWidget(self.chatgpt_translation_length_long)
+        # set default
+        if self.args.chatgpt_translation_length == "short":
+            self.chatgpt_translation_length_short.setChecked(True)
+        elif self.args.chatgpt_translation_length == "medium":
+            self.chatgpt_translation_length_medium.setChecked(True)
+        elif self.args.chatgpt_translation_length == "long":
+            self.chatgpt_translation_length_long.setChecked(True)
+        else:
+            self.chatgpt_translation_length_medium.setChecked(True)
         # Align to left
         chatgpt_translation_length_layout.addStretch(1)
         self.chatgpt_translation_length_group.setLayout(chatgpt_translation_length_layout)
@@ -201,6 +221,31 @@ class HotkeyThread(QThread):
         while True:
             keyboard.wait('ctrl+shift+s')
             self.hotkey_pressed.emit()
+
+class TranslationThread(QThread):
+    # Define a signal that will carry the translation result
+    signal = pyqtSignal(str)
+
+    def __init__(self, snipping_tool, text, translate_function_name):
+        QThread.__init__(self)
+        self.snipping_tool = snipping_tool
+        self.text = text
+        self.translate_function_name = translate_function_name
+
+    def run(self):
+        # Call the translation function and emit its result
+        translate_function = getattr(self.snipping_tool, self.translate_function_name)
+        translation = translate_function(self.text)
+        # tts
+        if translation not in ["", "No text detected", "HTTP error occurred"]:
+            if translation.split(":")[0] == "Google Translate":
+                if self.snipping_tool.main_window.tts_translated_checkbox.isChecked():
+                    self.snipping_tool.text_to_speech(translation.split(":")[1], self.snipping_tool.ttsen, "translated.wav")
+            elif translation.split(":")[0] == "ChatGPT":
+                if self.snipping_tool.main_window.tts_chatgpt_checkbox.isChecked():
+                    self.snipping_tool.text_to_speech(translation.split(":")[1], self.snipping_tool.ttsen, "chatgpt.wav")
+
+        self.signal.emit(translation)
 
 class SnippingTool(QMainWindow):
     def __init__(self, main_window, ttsjp, ttsen):
@@ -308,14 +353,19 @@ class SnippingTool(QMainWindow):
         event.ignore()
 
     def translate_and_copy_to_clipboard(self, text):
+        # Create a TranslationThread
+        self.translation_thread = TranslationThread(self, text, "google_translate")
+        # Connect the signal to a slot
+        self.translation_thread.signal.connect(self.update_translation)
+        # Start the thread
+        self.translation_thread.start()
 
-        # Translate via Google Translate
-        google_translate_thread = threading.Thread(target=self.google_translate, args=(text,))
-        google_translate_thread.start()
-
-        # Translate via ChatGPT
-        chatgpt_thread = threading.Thread(target=self.chatgpt_translate, args=(text,))
-        chatgpt_thread.start()
+        # Create a TranslationThread
+        self.chatgpt_translation_thread = TranslationThread(self, text, "chatgpt_translate")
+        # Connect the signal to a slot
+        self.chatgpt_translation_thread.signal.connect(self.update_translation)
+        # Start the thread
+        self.chatgpt_translation_thread.start()
 
     def google_translate(self, text):
         with open('input.txt', 'w', encoding='utf-8') as f:
@@ -323,11 +373,11 @@ class SnippingTool(QMainWindow):
         subprocess.run(['node', 'translate.js', 'input.txt', 'output.txt', str(self.main_window.proxy_timeout.value())])
         with open('output.txt', 'r', encoding='utf-8') as f:
             translated_text = f.read()
-        print("Google Translate: "+translated_text)
-        self.main_window.append_console_text("Google Translate: "+translated_text)
-        if translated_text == '':
-            translated_text = 'No text detected'
-        if self.main_window.tts_translated_checkbox.isChecked():
+        print("Google Translate: " + translated_text)
+
+        return "Google Translate: " + translated_text
+    
+        if self.main_window.tts_translated_checkbox.isChecked() and translated_text != '':
             self.text_to_speech(translated_text, self.ttsen, "translated.wav")
 
     def chatgpt_translate(self, text):
@@ -339,13 +389,20 @@ class SnippingTool(QMainWindow):
         elif self.main_window.chatgpt_translation_length_long.isChecked():
             translation_length = "long"
         result = get_gpt_translation(text, translation_length, self.main_window.proxy_timeout.value())
-        print("ChatGPT: "+result)
-        self.main_window.append_console_text("ChatGPT: "+result)
+        print("ChatGPT: " + result)
+        
+        return "ChatGPT: " + result
+
         if result == '':
             result = 'No text detected'
         result = result.split("Full explanation:")[0]
-        if self.main_window.tts_chatgpt_checkbox.isChecked():
+        if self.main_window.tts_chatgpt_checkbox.isChecked() and result != 'No text detected':
             self.text_to_speech(result, self.ttsen, "chatgpt.wav")
+
+    @QtCore.pyqtSlot(str)
+    def update_translation(self, result):
+        print(result)
+        self.main_window.append_console_text(result)
         
 
     def text_to_speech(self, text, tts, filename):
@@ -385,6 +442,9 @@ def parse_arguments():
     parser.add_argument("--use_manga_ocr", action="store_true", default=False, help="Use manga-ocr instead of tesserocr")
     parser.add_argument("--proxy_timeout", type=int, default=7000, help="Timeout for proxy requests (milliseconds))")
     parser.add_argument("--use_gpu", action="store_true", default=False, help="Use GPU for TTS")
+    parser.add_argument("--font_size", type=int, default=9, help="Font size for the snipping tool")
+    parser.add_argument("--console_font_size", type=int, default=9, help="Font size for the snipping tool")
+    parser.add_argument("--chatgpt_translation_length", type=str, default="medium", help="Translation length for ChatGPT")
     return parser.parse_args()
 
 def main():
