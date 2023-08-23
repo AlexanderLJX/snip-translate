@@ -1,4 +1,5 @@
 import sys
+import time
 import tesserocr
 from manga_ocr import MangaOcr
 from PyQt5.QtWidgets import QApplication, QMainWindow, QRubberBand
@@ -237,6 +238,16 @@ class TranslationThread(QThread):
         translate_function = getattr(self.snipping_tool, self.translate_function_name)
         translation = translate_function(self.text)
         # tts
+        # if http error retry
+        if translation == "ChatGPT: HTTP error occurred":
+            # start timer based on proxy timeout
+            start_time = time.time()
+            while translation == "ChatGPT: HTTP error occurred":
+                # if timeout reached, break
+                if time.time() - start_time > self.snipping_tool.main_window.proxy_timeout.value()/1000.0:
+                    break
+                print("HTTP error occurred, retrying...")
+                translation = translate_function(self.text)
         if translation not in ["", "No text detected", "HTTP error occurred"]:
             if translation.split(":")[0] == "Google Translate":
                 if self.snipping_tool.main_window.tts_translated_checkbox.isChecked():
