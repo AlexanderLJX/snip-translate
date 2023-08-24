@@ -258,6 +258,18 @@ class TranslationThread(QThread):
 
         self.signal.emit(translation)
 
+class CaptureThread(QThread):
+    capture_done = pyqtSignal(str)
+
+    def __init__(self, snipping_tool):
+        super().__init__()
+        self.snipping_tool = snipping_tool
+
+    def run(self):
+        # Perform the capture here
+        result = self.snipping_tool.capture()
+        self.capture_done.emit(result)
+
 class SnippingTool(QMainWindow):
     def __init__(self, main_window, ttsjp, ttsen):
         super().__init__()
@@ -266,6 +278,9 @@ class SnippingTool(QMainWindow):
         self.tts_lock = threading.Lock()
 
         self.ttsjp, self.ttsen = ttsjp, ttsen
+
+        self.capture_thread = CaptureThread(self)
+        self.capture_thread.capture_done.connect(self.on_capture_done)
 
     def initUI(self):
         self.setWindowTitle('Snipping Tool')
@@ -292,7 +307,17 @@ class SnippingTool(QMainWindow):
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self.capture()
+            # self.capture()
+            self.capture_thread.start()
+
+    def on_capture_done(self, text):
+        # Update the GUI after the capture is done
+        if self.main_window.translate_checkbox.isChecked():
+            print("Pre-translated text: "+text)
+            # add a divider
+            self.main_window.append_console_text("=========================")
+            self.main_window.append_console_text("Pre-translated text: "+text)
+            self.translate_and_copy_to_clipboard(text)
 
     def capture(self):
         rect = self.rubber_band.geometry()
@@ -352,12 +377,7 @@ class SnippingTool(QMainWindow):
             untranslated_tts_thread.start()
         pyperclip.copy(text)
         print("Text copied to clipboard")
-        if self.main_window.translate_checkbox.isChecked():
-            print("Pre-translated text: "+text)
-            # add a divider
-            self.main_window.append_console_text("=========================")
-            self.main_window.append_console_text("Pre-translated text: "+text)
-            self.translate_and_copy_to_clipboard(text)
+        return text
 
     def closeEvent(self, event):
         self.hide()
