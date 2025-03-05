@@ -171,3 +171,4 @@ package-lock.json
 proxies.txt
 workingProxy.txt
 *.wav
+/manga-ocr-base

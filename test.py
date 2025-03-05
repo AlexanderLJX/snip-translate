@@ -12,7 +12,7 @@ import pyscreenshot as ImageGrab
 import keyboard
 import pyperclip
 import subprocess
-from TTS.api import TTS
+# from TTS.api import TTS
 import pyaudio
 import wave
 import librosa
@@ -22,10 +22,10 @@ import getproxies
 from requestgpt import get_gpt_translation
 import threading
 
-def initialize_tts(use_gpu):
-    ttsjp = TTS(model_name="tts_models/ja/kokoro/tacotron2-DDC", progress_bar=False, gpu=use_gpu)
-    ttsen = TTS(model_name="tts_models/en/ljspeech/vits", progress_bar=False, gpu=use_gpu)
-    return ttsjp, ttsen
+# def initialize_tts(use_gpu):
+#     ttsjp = TTS(model_name="tts_models/ja/kokoro/tacotron2-DDC", progress_bar=False, gpu=use_gpu)
+#     ttsen = TTS(model_name="tts_models/en/ljspeech/vits", progress_bar=False, gpu=use_gpu)
+#     return ttsjp, ttsen
 
 class MainWindow(QWidget):
     def __init__(self, args):
@@ -271,13 +271,13 @@ class CaptureThread(QThread):
         self.capture_done.emit(result)
 
 class SnippingTool(QMainWindow):
-    def __init__(self, main_window, ttsjp, ttsen):
+    def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
         self.initUI()
         self.tts_lock = threading.Lock()
 
-        self.ttsjp, self.ttsen = ttsjp, ttsen
+        # self.ttsjp, self.ttsen = ttsjp, ttsen
 
         self.capture_thread = CaptureThread(self)
         self.capture_thread.capture_done.connect(self.on_capture_done)
@@ -335,7 +335,7 @@ class SnippingTool(QMainWindow):
 
         text = ''
         if self.main_window.ocr_options_combobox.currentText() == "Manga OCR":
-            mocr = MangaOcr()
+            mocr = MangaOcr(pretrained_model_name_or_path="manga-ocr-base")
             text = mocr(img)
         elif self.main_window.ocr_options_combobox.currentText() == "TesserOCR jpn_vert":
             # Initialize the tesserocr API with the Japanese language and vertical text mode
@@ -420,9 +420,9 @@ class SnippingTool(QMainWindow):
         elif self.main_window.chatgpt_translation_length_long.isChecked():
             translation_length = "long"
         result = get_gpt_translation(text, translation_length, self.main_window.proxy_timeout.value())
-        print("ChatGPT: " + result)
+        print("Gemini: " + result)
         
-        return "ChatGPT: " + result
+        return "Gemini: " + result
 
         if result == '':
             result = 'No text detected'
@@ -480,13 +480,13 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
-    ttsjp, ttsen = initialize_tts(args.use_gpu)
+    # ttsjp, ttsen = initialize_tts(args.use_gpu)
     app = QApplication(sys.argv)
 
     main_window = MainWindow(args)
     main_window.show()
 
-    snipping_tool = SnippingTool(main_window, ttsjp, ttsen)
+    snipping_tool = SnippingTool(main_window)
     snipping_tool.hide()
 
     hotkey_thread = HotkeyThread()
